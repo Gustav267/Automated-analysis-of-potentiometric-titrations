@@ -75,11 +75,9 @@ print(f'Parameter C (Aep_gesch) bei: {Aep_gesch:.3f} ml')
 r_squared_from_report = result.rsquared if hasattr(result, 'rsquared') else None
 
 ##Tangentenverfahren##
-
-# Bereiche für die Suche nach Steigung 1 um Aep_gesch 2 ist nicht universell, sondern passt zu testdaten 
-#Bei größeren Bereichen gibt es fehler, dass f(x) komplexe werte ausgibt. muss gefixt werden um Program universell anwendbar zu machen 
-bereiche = [[Aep_gesch - 2, Aep_gesch], [Aep_gesch, Aep_gesch + 2]]
-bereiche_scaled = skaliere_x(np.array(bereiche))
+# Bereiche für die Suche nach Steigung 1 
+#bereiche = [[vol_min, Aep_gesch], [Aep_gesch, vol_max]]
+bereiche_scaled = [[0.00001, C_start], [C_start, 1]]# Vermeidet Probleme bei 0
 
 # Hilfsfunktion f(x) = erst_abl(x) - 1
 def f(x): 
@@ -94,6 +92,10 @@ def finde_x_bei_steigung_eins(bereich):
 # x-Werte mit Steigung 1 finden im Bereich und eindeutige Werte behalten
 x_steigung_eins = np.array([finde_x_bei_steigung_eins(bereich) for bereich in bereiche_scaled])
 x_steigung_eins = x_steigung_eins[x_steigung_eins != None]
+
+
+
+
 # Falls steigung 1 gefunden wurden, berechnen
 if len(x_steigung_eins) > 0:
     punkt_zu_steigung_eins = [np.array([x, seven_pl(x, **result.best_values)]) for x in x_steigung_eins]
@@ -178,3 +180,5 @@ ax1.legend(loc='upper left')
 #ax2.legend(loc='upper right')
 
 plt.show()
+
+
