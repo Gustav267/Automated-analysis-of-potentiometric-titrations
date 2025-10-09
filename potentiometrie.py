@@ -74,13 +74,12 @@ print(f'Parameter C (Aep_gesch) bei: {Aep_gesch:.3f} ml')
 # Extract R² from the fit report and save it as a parameter
 r_squared_from_report = result.rsquared if hasattr(result, 'rsquared') else None
 
-##weitere Auswertung##
-
-# Bereiche für die Suche nach Steigung 1 um Aep_gesch 2 ist nicht universell
-bereiche = [[Aep_gesch-2, Aep_gesch], [Aep_gesch, Aep_gesch+2]]
-bereiche_scaled = skaliere_x(np.array(bereiche))
-
 ##Tangentenverfahren##
+
+# Bereiche für die Suche nach Steigung 1 um Aep_gesch 2 ist nicht universell, sondern passt zu testdaten 
+#Bei größeren Bereichen gibt es fehler, dass f(x) komplexe werte ausgibt. muss gefixt werden um Program universell anwendbar zu machen 
+bereiche = [[Aep_gesch - 2, Aep_gesch], [Aep_gesch, Aep_gesch + 2]]
+bereiche_scaled = skaliere_x(np.array(bereiche))
 
 # Hilfsfunktion f(x) = erst_abl(x) - 1
 def f(x): 
@@ -89,16 +88,12 @@ def f(x):
 
 # Nullstellen der Ableitung - 1 suchen im bereich
 def finde_x_bei_steigung_eins(bereich):
-    res = root_scalar(f, bracket=bereich)  # sucht Nullstelle in Bereich 1
+    res = root_scalar( f, bracket=bereich, fprime=lambda x: (zwe_abl(x, **result.best_values)/(vol_max - vol_min)**2))  # sucht Nullstelle in Bereich 1
     return res.root if res.converged else None
 
 # x-Werte mit Steigung 1 finden im Bereich und eindeutige Werte behalten
 x_steigung_eins = np.array([finde_x_bei_steigung_eins(bereich) for bereich in bereiche_scaled])
 x_steigung_eins = x_steigung_eins[x_steigung_eins != None]
-
-
-
-
 # Falls steigung 1 gefunden wurden, berechnen
 if len(x_steigung_eins) > 0:
     punkt_zu_steigung_eins = [np.array([x, seven_pl(x, **result.best_values)]) for x in x_steigung_eins]
