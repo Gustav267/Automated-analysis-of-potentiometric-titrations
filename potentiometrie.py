@@ -10,8 +10,24 @@ import scipy.optimize as opt
 iterationen = 1000000
 # Excel-Datei einlesen(möglichst viele und dichte Messpunkte, mindestens 9)
 df = pd.read_excel("C:\\Users\\Gusta\\Documents\\CTA\\instru\\pot\\Datensaetze\\pot-hcl2.xlsx")
-vol_naoh, ph_wert = df.iloc[:, 0].values, df.iloc[:, 1].values
+vol_naoh, ph_wert = df.iloc[:, 0].dropna(), df.iloc[:, 1].dropna()
 
+# Drop all pH values strictly between 4 and 10 and their corresponding vol_naoh
+# Keep only points where pH <= 4 or pH >= 10
+mask = ~((ph_wert > 4) & (ph_wert < 10))
+vol_naoh = vol_naoh[mask].reset_index(drop=True)
+ph_wert = ph_wert[mask].reset_index(drop=True)
+
+# Berechnung des Startwerts für C --> mittelwert der x-Werte an der größten Steigung
+max_diff_index = np.argmax(np.diff(ph_wert))
+# Aep_gesch ist C_start skaliert auf die Original-Volumenskala
+Aep_gesch = np.mean(vol_naoh[max_diff_index:max_diff_index + 2])
+
+# Erste Filterung: Drop all vol_naoh values strictly between Aep_gesch - 5 and Aep_gesch + 5 and their corresponding ph_wert
+# Keep only points where vol_naoh <= Aep_gesch - 5 or vol_naoh >= Aep_gesch + 5
+mask_vol = ((vol_naoh > Aep_gesch - 5) & (vol_naoh < Aep_gesch + 5))
+vol_naoh = vol_naoh[mask_vol].reset_index(drop=True)
+ph_wert = ph_wert[mask_vol].reset_index(drop=True)
 #finde min und max der vol_naoh für die Skalierung
 vol_min, vol_max = min(vol_naoh), max(vol_naoh)
 
@@ -39,9 +55,8 @@ def zwe_abl(x, A, D, C, B, G,F, H):
 # Verbesserte Schätzung der Parameterwerte basierend auf skalierten Daten
 D_start, A_start = max(ph_wert), min(ph_wert)
 max_diff_index = np.argmax(np.diff(ph_wert))
-C_start = np.mean(x_scaled[max_diff_index:max_diff_index + 2])
+C_start = skaliere_x(Aep_gesch)
 #Aep_gesch ist C_start skaliert auf die Original-Volumenskala
-Aep_gesch= rescale_x(C_start)
 
 
 param_bounds = {
