@@ -8,7 +8,6 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QSpacerItem,
     QSizePolicy,
-    QLabel,
 )
 from black.trans import Callable
 
@@ -35,7 +34,7 @@ class MenuBar(QWidget):
             parent=self,
             text="Import aus Excel",
         )
-        import_excel_button.clicked.connect(self.__import_button)
+        import_excel_button.clicked.connect(self.import_button)
         add_button = QPushButton(
             icon=QIcon.fromTheme("list-add"),
             parent=self,
@@ -60,7 +59,7 @@ class MenuBar(QWidget):
         self.layout.addWidget(generate_plot_button)
         self.setLayout(self.layout)
 
-    def __import_button(self):
+    def import_button(self):
         self.logger.debug("Starting Excel Import...")
 
         def on_accept(data: list[OptionalDatapoint]):

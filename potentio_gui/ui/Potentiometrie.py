@@ -1,7 +1,7 @@
 import logging
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QHBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout
 
 from potentio_gui.lib.potentiometrie import create_plot
 from potentio_gui.ui.Line import QHLine, QVLine
@@ -27,14 +27,13 @@ class PotentiometrieWindow(QWidget):
         self.data = []
 
         # Setup Menu Bar
-        self.layout.addWidget(
-            MenuBar(
-                self.data_input.add_row,
-                self.data_input.reset_data,
-                self.generate_plot,
-                parent=self,
-            )
+        self.context_menu_bar = MenuBar(
+            self.data_input.add_row,
+            self.data_input.reset_data,
+            self.generate_plot,
+            parent=self,
         )
+        self.layout.addWidget(self.context_menu_bar)
         self.layout.addWidget(QHLine())
 
         subwidget = QWidget(self)

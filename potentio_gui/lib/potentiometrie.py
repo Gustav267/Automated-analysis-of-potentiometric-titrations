@@ -68,7 +68,11 @@ def create_plot(vol_naoh1: list[float], ph_wert1: list[float], ax1: Axes):
             A - D
         ) / (C * x * ((x / C) ** (B * G) + 1) ** 3) + B * G * (x / C) ** (B * G - 1) * (
             A - D
-        ) * (B * G - 1) / (C * x * ((x / C) ** (B * G) + 1) ** 2)
+        ) * (
+                B * G - 1
+        ) / (
+                C * x * ((x / C) ** (B * G) + 1) ** 2
+        )
 
     ###FIT ESRSTELLUNG ###
 
